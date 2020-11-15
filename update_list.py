@@ -85,6 +85,6 @@ class UpdateList():
         # get difference from db
         # update to db
 
-u = UpdateList(debug_mode=True)
-time.sleep(8)
-u.terminate()
+# u = UpdateList(debug_mode=True)
+# time.sleep(8)
+# u.terminate()

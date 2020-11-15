@@ -12,14 +12,23 @@ password=''
 db_name='Jplayer'
 
 """
+pip3 install PyMySQL
+pip3 install sqlalchemy
+"""
+
+"""
+create database Jplayer;
+"""
+
+"""
 CREATE TABLE `media_list` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255),
   `path` varchar(255) NOT NULL,
   `priority` int(10) unsigned NOT NULL,
-  `played` int(10) unsinged NOT NULL,
-  `failed` int(10) unsinged NOT NULL,
-  `jumped` int(10) unsinged NOT NULL,
+  `played` int(10) unsigned NOT NULL,
+  `failed` int(10) unsigned NOT NULL,
+  `jumped` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 """
@@ -30,20 +39,20 @@ class MediaListDB(Base):
     __table_initialized__ = False
     __tablename__ = 'media_list'
 
-    id = sa.Column('id', sa.Integer(), autoincrement=True, nullable=False))
-    name = sa.Column(sa.String(255), nullable=True))
-    path = sa.Column(sa.String(255), nullable=False))
-    priortity = sa.Column('priority', sa.Integer(), nullable=False))
-    played = sa.Column('played', sa.Integer(), nullable=False))
-    failed = sa.Column('failed', sa.Integer(), nullable=False))
-    jumped = sa.Column('jumped', sa.Integer(), nullable=False))
+    id = sa.Column('id', sa.Integer(), autoincrement=True, nullable=False)
+    name = sa.Column(sa.String(255), nullable=True)
+    path = sa.Column(sa.String(255), nullable=False)
+    priortity = sa.Column('priority', sa.Integer(), nullable=False)
+    played = sa.Column('played', sa.Integer(), nullable=False)
+    failed = sa.Column('failed', sa.Integer(), nullable=False)
+    jumped = sa.Column('jumped', sa.Integer(), nullable=False)
 
 class MediaList():
     def __init__(self):
         print('MediaList init start')
 
         # self.connection = 'mysql+pymysql://root@127.0.0.1/Jplayer'
-        self.connection='mysql+pymysql://' + uesr_name '@' + server_ip +'/' + db_name
+        self.connection='mysql+pymysql://' + uesr_name + '@' + server_ip +'/' + db_name
         print('connection = ', self.connection)
         self.engine = create_engine(connection)
         self.session = sessionmaker(bind=engine)
@@ -54,7 +63,7 @@ class MediaList():
         return list_all
 
     def get_id_by_path(self, path):
-        media = self.session.query(MediaListDB).filter(path=path)one_or_none()
+        media = self.session.query(MediaListDB).filter(path=path).one_or_none()
         if media:
             return media['id']
 
@@ -63,8 +72,8 @@ class MediaList():
         self.session.add(new_user)
         self.session.commit()
 
-    def delete_by_id(self, id)
-        media = self.session.query(MediaListDB).filter(id=id)one_or_none()
+    def delete_by_id(self, id):
+        media = self.session.query(MediaListDB).filter(id=id).one_or_none()
         if media:
             self.session.delete(media)
             self.session.commit()
@@ -83,49 +92,49 @@ class MediaList():
         self.session.commit()
     '''
 
-    def update(self, id, name=None, priority=None, played=None, failed=None, jumped=None)
-        media = self.session.query(MediaListDB).filter(id=id)one_or_none()
+    def update(self, id, name=None, priority=None, played=None, failed=None, jumped=None):
+        media = self.session.query(MediaListDB).filter(id=id).one_or_none()
         if media:
             db = User(
                 path=media['path'],
                 name=name if name else media['name'],
                 priority=priority if priority else media['priority'],
-                played=played if played else media['played']
-                failed=failed if failed else media['failed']
+                played=played if played else media['played'],
+                failed=failed if failed else media['failed'],
                 jumped=jumped if jumped else media['jumped']
             )
             db.update(db)
             self.session.commit()
 
-    def update_name(self, id, name)
+    def update_name(self, id, name):
         self.update(id, name=name)
 
-    def update_priority(self, id, action='add')
-        media = self.session.query(MediaListDB).filter(id=id)one_or_none()
+    def update_priority(self, id, action='add'):
+        media = self.session.query(MediaListDB).filter(id=id).one_or_none()
         if media:
             raw_priority = media['priority']
 
             if action == 'add':
                 priority = raw_priority + 1
-            else
+            else:
                 if raw_priority > 0:
                     priority = raw_priority - 1
                 else:
                     priority = 0
             self.update(id, priority=priority)
 
-    def increase_fail_count(self, id)
-        media = self.session.query(MediaListDB).filter(id=id)one_or_none()
+    def increase_fail_count(self, id):
+        media = self.session.query(MediaListDB).filter(id=id).one_or_none()
         if media:
             self.update(id, failed=media['failed'] + 1)
 
-    def increase_play_count(self, id)
-        media = self.session.query(MediaListDB).filter(id=id)one_or_none()
+    def increase_play_count(self, id):
+        media = self.session.query(MediaListDB).filter(id=id).one_or_none()
         if media:
             self.update(id, played=media['played'] + 1)
 
-    def increase_jump_count(self, id)
-        media = self.session.query(MediaListDB).filter(id=id)one_or_none()
+    def increase_jump_count(self, id):
+        media = self.session.query(MediaListDB).filter(id=id).one_or_none()
         if media:
             self.update(id, jumped=media['jumped'] + 1)
 
@@ -135,8 +144,9 @@ import random
 r = random.randint(1, 10000)
 test_name = 'test' + str(r)
 
-Medialist m
+m = Medialist()
 list_all = m.get_list_all()
+print(list_all)
 for one in list_all:
     print(one)
 

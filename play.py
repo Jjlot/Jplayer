@@ -8,6 +8,7 @@ import vlc
 import functools
 import termios
 import tty
+import media_list
 
 from pynput import keyboard
 from flask import Flask
@@ -25,15 +26,17 @@ CREATE TABLE IF NOT EXISTS `list`(
 
 # @ -------- DEPENDENCY --------
 """
-pip install pynput
-
-pip install flask
+pip3 install python-vlc
+pip3 install pynput
+pip3 install flask
+pip3 install python-xlib
+pip3 install system_hotkey
 
 yum install kernel-headers-$(uname -r) -y
 yum install gcc -y
 yum install python-devel
-pip install python-xlib
-pip install system_hotkey
+
+sed -i 's/geteuid/getppid/' /usr/bin/vlc
 """
 
 # @ -------- GLOBAL --------
@@ -115,7 +118,9 @@ def mount_nfs():
     # Mount nfs
     print(" Mounting nfs")
     while os.system("mount | grep " + local_dir) != 0:
-        os.system("sudo mount -t nfs " + nfs_ip + ":" + nfs_dir + " " + local_dir)
+        cmd = "sudo mount -t nfs " + nfs_ip + ":" + nfs_dir + " " + local_dir
+        print("run-cmd: ", cmd)
+        os.system(cmd)
         time.sleep(5)
 
 
@@ -162,7 +167,37 @@ def _play(video):
     return
 
 
+def test():
+    print('in test')
+    # Test
+    import random
+
+    r = random.randint(1, 10000)
+    media_name = 'name' + str(r)
+    media_path = 'path' + str(r)
+
+    m = media_list.MediaList()
+    m.create(path=media_path, name=media_name)
+
+    vid = m.get_id_by_path(media_path)
+    m.increase_fail_count(vid)
+    m.increase_play_count(vid)
+    m.increase_jump_count(vid)
+    # m.update_priority(vid)
+    m.update_priority(vid, action='low')
+    m.update_name(vid, 'a new name')
+
+    list_all = m.get_list_all()
+    for one in list_all:
+        # print('-' * 20)
+        m.show_info(one)
+        # print(one.name)
+        m.delete_by_id(one.id)
+
+
 if __name__ == '__main__':
+    test()
+    exit(0)
 
     opts, args = getopt.getopt(sys.argv[1:], '-h-f:-d', ['help', 'filename=', 'debug'])
     # print(opts)
@@ -183,6 +218,8 @@ if __name__ == '__main__':
 
     test_path = "/home/src/jnote/test"
     print(test_path)
+
+    # global jump
 
     # start_play(test_path)
 
@@ -241,7 +278,6 @@ if __name__ == '__main__':
                 abs_path = content + "/" + file
                 _play(abs_path)
 
-                global jump
                 if jump:
                     break
 

@@ -13,8 +13,7 @@ from pynput import keyboard
 from flask import Flask
 from threading import Thread
 
-
-#@ -------- DATABASE --------
+# @ -------- DATABASE --------
 """
 CREATE TABLE IF NOT EXISTS `list`(
    `id` INT UNSIGNED AUTO_INCREMENT,
@@ -24,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `list`(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 """
 
-#@ -------- DEPENDENCY --------
+# @ -------- DEPENDENCY --------
 """
 pip install pynput
 
@@ -37,12 +36,11 @@ pip install python-xlib
 pip install system_hotkey
 """
 
-#@ -------- GLOBAL --------
+# @ -------- GLOBAL --------
 media_player = None
 jump = False
 
-
-#@ -------- CONFIG --------
+# @ -------- CONFIG --------
 # run_mode = 'local'
 run_mode = 'remote'
 directory = "/home/"
@@ -51,9 +49,9 @@ nfs_ip = "192.168.0.102"
 nfs_dir = "/media/slot3_4t/media"
 local_dir = "/home/pi/Desktop/nfs"
 
-#@ -------- CONFIG end --------
+# @ -------- CONFIG end --------
 
-#@ -------- HOTKEYS --------
+# @ -------- HOTKEYS --------
 # The key combination to check
 COMBINATIONS = [
     {keyboard.Key.ctrl, keyboard.KeyCode(char='q')},
@@ -63,11 +61,13 @@ COMBINATIONS = [
 # The currently active modifiers
 current = set()
 
+
 def execute():
     global media_player
     global jump
     jump = True
     media_player.stop()
+
 
 def on_press(key):
     if any([key in COMBO for COMBO in COMBINATIONS]):
@@ -75,68 +75,74 @@ def on_press(key):
         if any(all(k in current for k in COMBO) for COMBO in COMBINATIONS):
             execute()
 
+
 def on_release(key):
     if any([key in COMBO for COMBO in COMBINATIONS]):
         current.remove(key)
+
 
 def hotkey_listener():
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
 
 
-#@ -------- RESTAPI --------
+# @ -------- RESTAPI --------
 app = Flask(__name__)
 
-@app.route('/')  
+
+@app.route('/')
 def hello_world():
     return "hello world"
 
-@app.route('/title/',methods=['GET'])
+
+@app.route('/title/', methods=['GET'])
 def rest_get_title():
     return str(media_player.get_title())
 
+
 # curl --request POST 127.0.0.1:5000/next/
-@app.route('/next/',methods=['POST'])
+@app.route('/next/', methods=['POST'])
 def rest_post_next():
     return str(media_player.stop())
+
 
 def web_server():
     app.run()
 
 
-#@ -------- WHAT --------
+# @ -------- WHAT --------
 def mount_nfs():
     # Mount nfs
     print(" Mounting nfs")
-    while os.system("mount | grep " + local_dir) != 0 :
+    while os.system("mount | grep " + local_dir) != 0:
         os.system("sudo mount -t nfs " + nfs_ip + ":" + nfs_dir + " " + local_dir)
         time.sleep(5)
 
+
 def _play(video):
     print('playing: %s', video)
-
 
     global media_player
     global jump
     jump = False
 
     # creating Instance class object 
-    player = vlc.Instance() 
+    player = vlc.Instance()
 
     # creating a new media 
     media = player.media_new(video)
 
     # creating a media player object 
-    media_player = player.media_player_new() 
+    media_player = player.media_player_new()
 
-    media_player.set_media(media) 
+    media_player.set_media(media)
 
     media_player.set_video_title_display(3, 8000)
 
     # media_player.set_fullscreen(True)
 
     # start playing video 
-    media_player.play() 
+    media_player.play()
     time.sleep(1)
     duration = 1000
     mv_length = media_player.get_length() - 1000
@@ -155,20 +161,21 @@ def _play(video):
     media_player.stop()
     return
 
+
 if __name__ == '__main__':
 
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-d',['help','filename=','debug'])
+    opts, args = getopt.getopt(sys.argv[1:], '-h-f:-d', ['help', 'filename=', 'debug'])
     # print(opts)
-    for opt_name,opt_value in opts:
-        if opt_name in ('-h','--help'):
+    for opt_name, opt_value in opts:
+        if opt_name in ('-h', '--help'):
             print("[*] Help info")
-        if opt_name in ('-d','--debug'):
+        if opt_name in ('-d', '--debug'):
             print(" Debug mode ")
             debug_mode = True
 
-        if opt_name in ('-f','--filename'):
+        if opt_name in ('-f', '--filename'):
             fileName = opt_value
-            print("[*] Filename is ",fileName)
+            print("[*] Filename is ", fileName)
             # do something
 
     if run_mode == 'remote':
@@ -199,12 +206,12 @@ if __name__ == '__main__':
     # print(" Got the classifies: " + str(classifies)) 
 
     # 2. Get all the play contents
-    contents = [] 
+    contents = []
     for classify in classifies:
         ones = os.listdir(classify)
         for one in ones:
-            contents.append(classify + "/" + one)    
-    # print(contents)
+            contents.append(classify + "/" + one)
+            # print(contents)
 
     # 3. Set to random
     contents = random.sample(contents, len(contents))
@@ -217,7 +224,6 @@ if __name__ == '__main__':
     # 3.6 Start web interface
     t2 = Thread(target=web_server)
     t2.start()
-
 
     # 4. Play
     for content in contents:
@@ -237,9 +243,7 @@ if __name__ == '__main__':
 
                 global jump
                 if jump:
-                    break;
+                    break
 
         else:
             print(" Something error")
-
-

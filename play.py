@@ -195,10 +195,24 @@ def test():
         m.delete_by_id(one.id)
 
 
-if __name__ == '__main__':
-    test()
-    exit(0)
+def update_database(contents):
+    m = media_list.MediaList()
+    for content in contents:
+        vid = m.get_id_by_path(content)
+        if vid:
+            pass
+        else:
+            m.create(path=content)
 
+    list_all = m.get_list_all()
+    for one in list_all:
+        # print('-' * 20)
+        m.show_info(one)
+        # print(one.name)
+        # m.delete_by_id(one.id)
+
+
+if __name__ == '__main__':
     opts, args = getopt.getopt(sys.argv[1:], '-h-f:-d', ['help', 'filename=', 'debug'])
     # print(opts)
     for opt_name, opt_value in opts:
@@ -249,6 +263,10 @@ if __name__ == '__main__':
         for one in ones:
             contents.append(classify + "/" + one)
             # print(contents)
+
+    # 2.5 update database
+    update_database(contents)
+    exit(0)
 
     # 3. Set to random
     contents = random.sample(contents, len(contents))

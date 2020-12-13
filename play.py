@@ -205,16 +205,25 @@ def update_database(contents):
 
 def nfs_list_test():
     nfs_local_path = "/home/pi/Desktop/nfs"
-    aa = nfs.Nfs(nfs_local_path)
+    config_file = "./config.ini"
+
+    aa = nfs.Nfs(nfs_local_path, config_file)
     aa.mount()
     contents = aa.get_list()
     print(contents)
+    # for co in contents:
+    # print(co)
 
 
+"""
+>>> os.path.splitext(aaa)
+('龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD', '.mp4')
+>>> os.path.splitext(aaa)[0]
+'龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD'
+"""
 if __name__ == '__main__':
     nfs_list_test()
     exit(0)
-
 
     opts, args = getopt.getopt(sys.argv[1:], '-h-f:-d', ['help', 'filename=', 'debug'])
     # print(opts)

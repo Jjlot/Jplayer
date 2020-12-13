@@ -9,6 +9,7 @@ import functools
 import termios
 import tty
 import media_list
+import nfs
 
 from pynput import keyboard
 from flask import Flask
@@ -114,16 +115,6 @@ def web_server():
 
 
 # @ -------- WHAT --------
-def mount_nfs():
-    # Mount nfs
-    print(" Mounting nfs")
-    while os.system("mount | grep " + local_dir) != 0:
-        cmd = "sudo mount -t nfs " + nfs_ip + ":" + nfs_dir + " " + local_dir
-        print("run-cmd: ", cmd)
-        os.system(cmd)
-        time.sleep(5)
-
-
 def _play(video):
     print('playing: %s', video)
 
@@ -212,7 +203,19 @@ def update_database(contents):
         # m.delete_by_id(one.id)
 
 
+def nfs_list_test():
+    nfs_local_path = "/home/pi/Desktop/nfs"
+    aa = nfs.Nfs(nfs_local_path)
+    aa.mount()
+    contents = aa.get_list()
+    print(contents)
+
+
 if __name__ == '__main__':
+    nfs_list_test()
+    exit(0)
+
+
     opts, args = getopt.getopt(sys.argv[1:], '-h-f:-d', ['help', 'filename=', 'debug'])
     # print(opts)
     for opt_name, opt_value in opts:

@@ -74,7 +74,7 @@ class UpdateList():
     def scan_disk(self):
         print('--------->start scan disk')
         contents = []
-        for path in paths.splite(',')
+        for path in paths.splite(','):
             contents.append(self.scan_path(path))
 
         self.compare_to_db(contents)

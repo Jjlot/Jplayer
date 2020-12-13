@@ -158,7 +158,7 @@ def _play(video):
     return
 
 
-def test():
+def test_for_database():
     print('in test')
     # Test
     import random
@@ -186,7 +186,24 @@ def test():
         m.delete_by_id(one.id)
 
 
-def update_database(contents):
+"""
+>>> os.path.splitext(aaa)
+('龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD', '.mp4')
+>>> os.path.splitext(aaa)[0]
+'龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD'
+"""
+if __name__ == '__main__':
+    # start with config
+    nfs_local_path = "/home/pi/Desktop/nfs"
+    config_file = "./config.ini"
+
+    # 1. get nfs list
+    nfs_instance = nfs.Nfs(nfs_local_path, config_file)
+    nfs_instance.mount()
+    contents = nfs_instance.get_list()
+    print(contents)
+
+    # 2. update database
     m = media_list.MediaList()
     for content in contents:
         vid = m.get_id_by_path(content)
@@ -196,33 +213,8 @@ def update_database(contents):
             m.create(path=content)
 
     list_all = m.get_list_all()
-    for one in list_all:
-        # print('-' * 20)
-        m.show_info(one)
-        # print(one.name)
-        # m.delete_by_id(one.id)
+    m.show_info(list_all)
 
-
-def nfs_list_test():
-    nfs_local_path = "/home/pi/Desktop/nfs"
-    config_file = "./config.ini"
-
-    aa = nfs.Nfs(nfs_local_path, config_file)
-    aa.mount()
-    contents = aa.get_list()
-    print(contents)
-    # for co in contents:
-    # print(co)
-
-
-"""
->>> os.path.splitext(aaa)
-('龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD', '.mp4')
->>> os.path.splitext(aaa)[0]
-'龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD'
-"""
-if __name__ == '__main__':
-    nfs_list_test()
     exit(0)
 
     opts, args = getopt.getopt(sys.argv[1:], '-h-f:-d', ['help', 'filename=', 'debug'])
@@ -239,8 +231,8 @@ if __name__ == '__main__':
             print("[*] Filename is ", fileName)
             # do something
 
-    if run_mode == 'remote':
-        mount_nfs()
+    # if run_mode == 'remote':
+    #     mount_nfs()
 
     test_path = "/home/src/jnote/test"
     print(test_path)
@@ -277,7 +269,6 @@ if __name__ == '__main__':
             # print(contents)
 
     # 2.5 update database
-    update_database(contents)
     exit(0)
 
     # 3. Set to random

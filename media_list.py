@@ -135,15 +135,16 @@ class MediaList(object):
             self.update(vid, jumped=media.jumped + 1)
 
     @staticmethod
-    def show_info(media):
-        table = PrettyTable(['id', 'name', 'path', 'priority', 'played', 'failed', 'jumped'])
-        table.add_row([
-            media.id,
-            media.name,
-            media.path,
-            media.priority,
-            media.played,
-            media.failed,
-            media.jumped
-        ])
+    def show_info(medias):
+        table = PrettyTable(['id', 'name', 'priority', 'played', 'failed', 'jumped', 'path'])
+        for media in medias:
+            table.add_row([
+                media.id,
+                media.name,
+                media.priority,
+                media.played,
+                media.failed,
+                media.jumped,
+                media.path[:70],
+            ])
         print(table)

@@ -15,16 +15,6 @@ from pynput import keyboard
 from flask import Flask
 from threading import Thread
 
-# @ -------- DATABASE --------
-"""
-CREATE TABLE IF NOT EXISTS `list`(
-   `id` INT UNSIGNED AUTO_INCREMENT,
-   `path` VARCHAR(100) NOT NULL,
-   `weight` INT NOT NULL,
-   PRIMARY KEY ( `id` )
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-"""
-
 # @ -------- DEPENDENCY --------
 """
 pip3 install python-vlc

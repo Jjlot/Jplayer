@@ -1,1 +1,1 @@
-mysql -DJplayer -e 'select * from media_list;'
+for i in {1..100000}; do python3 play.py; done

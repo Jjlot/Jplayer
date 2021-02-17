@@ -135,7 +135,7 @@ def _play(video):
 
     media_player.set_video_title_display(3, 8000)
 
-    # media_player.set_fullscreen(True)
+    media_player.set_fullscreen(True)
 
     # start playing video 
     media_player.play()
@@ -186,12 +186,6 @@ def test_for_database():
         m.delete_by_id(one.id)
 
 
-"""
->>> os.path.splitext(aaa)
-('龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD', '.mp4')
->>> os.path.splitext(aaa)[0]
-'龙珠超：布罗利.Dragon.Ball.Super.Broly.2018.中文字幕.BDrip.1080p.LD'
-"""
 if __name__ == '__main__':
     # start with config
     nfs_local_path = "/home/pi/Desktop/nfs"
@@ -204,7 +198,7 @@ if __name__ == '__main__':
     print(contents)
 
     # 2. update database
-    m = media_list.MediaList()
+    m = media_list.MediaList(config_file)
     for content in contents:
         vid = m.get_id_by_path(content)
         if vid:
@@ -215,65 +209,10 @@ if __name__ == '__main__':
     list_all = m.get_list_all()
     m.show_info(list_all)
 
-    exit(0)
-
-    opts, args = getopt.getopt(sys.argv[1:], '-h-f:-d', ['help', 'filename=', 'debug'])
-    # print(opts)
-    for opt_name, opt_value in opts:
-        if opt_name in ('-h', '--help'):
-            print("[*] Help info")
-        if opt_name in ('-d', '--debug'):
-            print(" Debug mode ")
-            debug_mode = True
-
-        if opt_name in ('-f', '--filename'):
-            fileName = opt_value
-            print("[*] Filename is ", fileName)
-            # do something
-
-    # if run_mode == 'remote':
-    #     mount_nfs()
-
-    test_path = "/home/src/jnote/test"
-    print(test_path)
-
-    # global jump
-
-    # start_play(test_path)
-
-    # 1. Find the root media directories
-    # path = test_path
-    path = local_dir
-    # print(" Walking in path: " + path)
-
-    directories = os.listdir(path)
-
-    # print(directories)
-    classifies = []
-    for directory in directories:
-        abs_dir = path + "/" + directory
-        # print(" Scan directory: " + abs_dir) 
-        if os.path.isdir(abs_dir):
-            # print(" New classify directory")
-            classifies.append(abs_dir)
-            # _play(d1)
-
-    # print(" Got the classifies: " + str(classifies)) 
-
-    # 2. Get all the play contents
-    contents = []
-    for classify in classifies:
-        ones = os.listdir(classify)
-        for one in ones:
-            contents.append(classify + "/" + one)
-            # print(contents)
-
-    # 2.5 update database
-    exit(0)
-
-    # 3. Set to random
-    contents = random.sample(contents, len(contents))
-    print(contents)
+    # Get a random one
+    # one = m.get_random()
+    # print('-'*30)
+    # print(one)
 
     # 3.5 Start hot_key listener
     t = Thread(target=hotkey_listener)
@@ -284,7 +223,12 @@ if __name__ == '__main__':
     t2.start()
 
     # 4. Play
-    for content in contents:
+    while True:
+        one = m.get_random()
+        print('--' * 30)
+        content = nfs_local_path + one
+        print(content)
+
         if os.path.isfile(content):
             # print(" It's a file")
             _play(content)
@@ -301,6 +245,5 @@ if __name__ == '__main__':
 
                 if jump:
                     break
-
         else:
             print(" Something error")

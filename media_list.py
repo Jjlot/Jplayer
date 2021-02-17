@@ -3,15 +3,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy as sa
 from prettytable import PrettyTable
+import random
+from configparser import ConfigParser
 
 # sa.Column, sa.String, sa.create_engine
 
 Base = declarative_base()
-
-server_ip = '127.0.0.1'
-user_name = 'root'
-password = ''
-db_name = 'Jplayer'
 
 """
 pip3 install PyMySQL
@@ -52,11 +49,21 @@ class MediaListDB(Base):
 
 
 class MediaList(object):
-    def __init__(self):
+    def __init__(self, config_file):
         print('MediaList init start')
 
+        cfg = ConfigParser()
+        cfg.read(config_file)
+
+        cs = cfg.__getitem__('database')
+
+        server_ip = cs.get('ip')
+        username = cs.get('username')
+        db_name = cs.get('db_name')
+        # password = cs.get('password')
+
         # self.connection = 'mysql+pymysql://root@127.0.0.1/Jplayer'
-        connection = 'mysql+pymysql://' + user_name + '@' + server_ip + '/' + db_name
+        connection = 'mysql+pymysql://' + username + '@' + server_ip + '/' + db_name
         print('connection = ', connection)
         engine = create_engine(connection)
         db_session = sessionmaker(bind=engine)
@@ -73,7 +80,7 @@ class MediaList(object):
             return media.id
 
     def create(self, path, name=None):
-        new_list = MediaListDB(path=path, name=name, priority=100, played=0, failed=0, jumped=0)
+        new_list = MediaListDB(path=path, name=name, priority=5, played=0, failed=0, jumped=0)
         self.session.add(new_list)
         self.session.commit()
 
@@ -148,3 +155,18 @@ class MediaList(object):
                 media.path[:70],
             ])
         print(table)
+
+    def get_random(self):
+        medias = self.get_list_all()
+
+        all_media = []
+        for media in medias:
+            for i in range(media.priority):
+                all_media.append(media.path)
+
+        print(len(medias))
+        print(len(all_media))
+        r = random.randint(0, len(all_media))
+        print(all_media[r])
+
+        return all_media[r]
